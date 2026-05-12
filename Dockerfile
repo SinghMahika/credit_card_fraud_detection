@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-WORKDIR /fraud-detection-app
+WORKDIR /credit_card_fraud_detection
 
 COPY requirements.txt .
 
@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8501
 
-CMD ("uvicorn", "backend_app:app", "--reload")
+CMD ("streamlit", "run", "app.py", "--server.address", "0.0.0.0")
