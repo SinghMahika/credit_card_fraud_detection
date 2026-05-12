@@ -52,7 +52,6 @@ credit-card-fraud-detection/
 ├── Dockerfile
 ├── terraform/
 │   ├── main.tf
-│   ├── output.tf
 │   └── terraform.tfstate
 │
 ├── sample_input.csv
