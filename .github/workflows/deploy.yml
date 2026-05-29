@@ -36,24 +36,19 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Install AWS CLI v2 if not present
-            if ! command -v aws &> /dev/null; then
-              sudo apt-get install -y unzip curl
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
-              rm -rf awscliv2.zip aws/
-            fi
-
-            # Set AWS credentials
             export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             export AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}
-
-            # Login to ECR, pull and run container
+          
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-              sudo -E docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
-            sudo -E docker pull ${{ secrets.ECR_REPOSITORY }}:latest
+              sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+          
+            sudo docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+          
             sudo docker stop fraud-app || true
             sudo docker rm fraud-app || true
-            sudo -E docker run -d --name fraud-app -p 8501:8501 ${{ secrets.ECR_REPOSITORY }}:latest
+          
+            sudo docker run -d \
+              --name fraud-app \
+              -p 8501:8501 \
+              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
