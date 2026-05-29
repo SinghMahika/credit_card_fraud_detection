@@ -44,6 +44,10 @@ jobs:
               sudo systemctl enable docker
             fi
 
+            # Fix Docker DNS
+            echo '{"dns": ["8.8.8.8", "8.8.4.4"]}' | sudo tee /etc/docker/daemon.json
+            sudo systemctl restart docker
+
             # Install AWS CLI v2 if not present
             if ! command -v aws &> /dev/null; then
               sudo apt-get install -y unzip curl
@@ -53,7 +57,7 @@ jobs:
               rm -rf awscliv2.zip aws/
             fi
 
-            # Set AWS credentials as environment variables
+            # Set AWS credentials
             export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             export AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}
