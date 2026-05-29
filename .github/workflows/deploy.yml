@@ -47,12 +47,16 @@ jobs:
               sudo systemctl start docker
               sudo systemctl enable docker
             fi
-      
-            # Install AWS CLI if not present
+          
+            # Install AWS CLI v2 if not present
             if ! command -v aws &> /dev/null; then
-              sudo apt-get install -y awscli
+              sudo apt-get install -y unzip curl
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+              rm -rf awscliv2.zip aws/
             fi
-      
+          
             # Login to ECR, pull and run container
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
