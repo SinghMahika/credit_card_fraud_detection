@@ -40,6 +40,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Install Docker if not present
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+      
+            # Install AWS CLI if not present
+            if ! command -v aws &> /dev/null; then
+              sudo apt-get install -y awscli
+            fi
+      
+            # Login to ECR, pull and run container
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
             sudo docker pull ${{ secrets.ECR_REPOSITORY }}:latest
