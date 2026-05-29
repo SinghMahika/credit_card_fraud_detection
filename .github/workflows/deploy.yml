@@ -1,14 +1,10 @@
-
 name: CI/CD Pipeline
-
 on:
   push:
     branches: [main]
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -47,7 +43,7 @@ jobs:
               sudo systemctl start docker
               sudo systemctl enable docker
             fi
-          
+
             # Install AWS CLI v2 if not present
             if ! command -v aws &> /dev/null; then
               sudo apt-get install -y unzip curl
@@ -56,11 +52,16 @@ jobs:
               sudo ./aws/install
               rm -rf awscliv2.zip aws/
             fi
-          
+
+            # Set AWS credentials as environment variables
+            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}
+
             # Login to ECR, pull and run container
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-              sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
-            sudo docker pull ${{ secrets.ECR_REPOSITORY }}:latest
+              sudo -E docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+            sudo -E docker pull ${{ secrets.ECR_REPOSITORY }}:latest
             sudo docker stop fraud-app || true
             sudo docker rm fraud-app || true
-            sudo docker run -d --name fraud-app -p 8501:8501 ${{ secrets.ECR_REPOSITORY }}:latest
+            sudo -E docker run -d --name fraud-app -p 8501:8501 ${{ secrets.ECR_REPOSITORY }}:latest
