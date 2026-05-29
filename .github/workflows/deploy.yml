@@ -36,18 +36,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Install Docker if not present
-            if ! command -v docker &> /dev/null; then
-              sudo apt-get update -y
-              sudo apt-get install -y docker.io
-              sudo systemctl start docker
-              sudo systemctl enable docker
-            fi
-
-            # Fix Docker DNS
-            echo '{"dns": ["8.8.8.8", "8.8.4.4"]}' | sudo tee /etc/docker/daemon.json
-            sudo systemctl restart docker
-
             # Install AWS CLI v2 if not present
             if ! command -v aws &> /dev/null; then
               sudo apt-get install -y unzip curl
