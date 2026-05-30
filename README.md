@@ -1,12 +1,12 @@
 # Credit Card Fraud Detection System
 
-An end-to-end Machine Learning application for detecting fraudulent credit card transactions, deployed on AWS using Docker, Terraform, EC2, and Amazon ECR.
+An end-to-end Machine Learning application for detecting fraudulent credit card transactions, deployed on AWS using Docker, Terraform, EC2, Amazon ECR, and GitHub Actions CI/CD.
 
 ---
 
 ## Overview
 
-This project explores the complete deployment lifecycle of an ML application — from model training and containerization to infrastructure provisioning and cloud deployment.
+This project explores the complete deployment lifecycle of an ML application — from model training and containerization to infrastructure provisioning, cloud deployment, and automated CI/CD.
 
 The application uses a fraud detection model trained on a real-world transactional dataset containing highly imbalanced fraud patterns and anonymized behavioral features.
 
@@ -23,11 +23,13 @@ Users can upload transaction data through a Streamlit-based interface and receiv
 * AWS EC2 deployment
 * Infrastructure provisioning using Terraform
 * Docker image management using Amazon ECR
+* Automated CI/CD pipeline using GitHub Actions
+* Automatic deployment on every push to the `main` branch
 * End-to-end cloud deployment workflow
 
 ---
 
-# Tech Stack
+## Tech Stack
 
 | Category               | Technologies                |
 | ---------------------- | --------------------------- |
@@ -36,20 +38,25 @@ Users can upload transaction data through a Streamlit-based interface and receiv
 | Frontend               | Streamlit                   |
 | Containerization       | Docker                      |
 | Infrastructure as Code | Terraform                   |
+| CI/CD                  | GitHub Actions              |
 | Cloud Platform         | AWS                         |
 | AWS Services           | EC2, ECR                    |
 
 ---
 
-# Project Structure
+## Project Structure
 
-```bash
+```text
 credit-card-fraud-detection/
 │
 ├── app.py
 ├── model.pkl
 ├── requirements.txt
 ├── Dockerfile
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+│
 ├── terraform/
 │   ├── main.tf
 │   └── terraform.tfstate
@@ -60,7 +67,7 @@ credit-card-fraud-detection/
 
 ---
 
-# Model Workflow
+## Model Workflow
 
 1. Train fraud detection model on transaction dataset
 2. Save trained model as `model.pkl`
@@ -71,21 +78,21 @@ credit-card-fraud-detection/
 
 ---
 
-# Docker Setup
+## Docker Setup
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 docker build -t fraud-detection-app .
 ```
 
-## Run Container Locally
+### Run Container Locally
 
 ```bash
 docker run -p 8501:8501 fraud-detection-app
 ```
 
-## Access Application
+### Access Application
 
 ```text
 http://localhost:8501
@@ -93,21 +100,21 @@ http://localhost:8501
 
 ---
 
-# AWS ECR Workflow
+## AWS ECR Workflow
 
-## Authenticate Docker with ECR
+### Authenticate Docker with ECR
 
 ```bash
 aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <your-ecr-url>
 ```
 
-## Tag Docker Image
+### Tag Docker Image
 
 ```bash
 docker tag fraud-detection-app:latest <your-ecr-url>/fraud-detection-app:latest
 ```
 
-## Push Docker Image
+### Push Docker Image
 
 ```bash
 docker push <your-ecr-url>/fraud-detection-app:latest
@@ -115,39 +122,41 @@ docker push <your-ecr-url>/fraud-detection-app:latest
 
 ---
 
-# Terraform Infrastructure Setup
+## Terraform Infrastructure Setup
 
 Terraform was used to provision:
 
-* EC2 instance
-* Security groups
-* Public IP access
+* EC2 Instance
+* Security Groups
+* SSH Access
+* Public IP Access
+* Network Configuration
 
-## Initialize Terraform
+### Initialize Terraform
 
 ```bash
 terraform init
 ```
 
-## Validate Configuration
+### Validate Configuration
 
 ```bash
 terraform validate
 ```
 
-## Format Configuration
+### Format Configuration
 
 ```bash
 terraform fmt
 ```
 
-## Apply Infrastructure
+### Apply Infrastructure
 
 ```bash
 terraform apply
 ```
 
-## Destroy Infrastructure
+### Destroy Infrastructure
 
 ```bash
 terraform destroy
@@ -155,27 +164,76 @@ terraform destroy
 
 ---
 
-# EC2 Deployment Workflow
+## CI/CD Pipeline
 
-## SSH into EC2
+The project implements a fully automated CI/CD pipeline using GitHub Actions, Amazon ECR, Docker, and AWS EC2.
+
+### Workflow
+
+1. Developer pushes code to the `main` branch.
+2. GitHub Actions workflow is triggered automatically.
+3. Docker image is built from the latest source code.
+4. The image is pushed to Amazon Elastic Container Registry (ECR).
+5. GitHub Actions connects to the EC2 instance via SSH.
+6. EC2 authenticates with ECR and pulls the latest image.
+7. Existing Docker container is stopped and removed.
+8. A new container is launched using the updated image.
+9. The latest version of the application becomes available automatically.
+
+### GitHub Actions Workflow
+
+```text
+Developer
+    ↓
+Git Push
+    ↓
+GitHub Actions
+    ↓
+Docker Build
+    ↓
+Amazon ECR
+    ↓
+SSH to EC2
+    ↓
+Pull Latest Image
+    ↓
+Replace Running Container
+    ↓
+Application Live
+```
+
+### Benefits
+
+* Fully automated deployments
+* Consistent build and release process
+* Reduced manual operational effort
+* Faster delivery of application updates
+* Reproducible deployment workflow
+* Improved DevOps and MLOps practices
+
+---
+
+## EC2 Deployment Workflow
+
+### SSH into EC2
 
 ```bash
 ssh -i <key.pem> ubuntu@<public-ip>
 ```
 
-## Pull Docker Image
+### Pull Docker Image
 
 ```bash
 sudo docker pull <your-ecr-url>/fraud-detection-app:latest
 ```
 
-## Run Container
+### Run Container
 
 ```bash
-sudo docker run -p 8501:8501 <your-ecr-url>/fraud-detection-app:latest
+sudo docker run -d --name fraud-app -p 8501:8501 <your-ecr-url>/fraud-detection-app:latest
 ```
 
-## Access Hosted Application
+### Access Hosted Application
 
 ```text
 http://<public-ip>:8501
@@ -183,97 +241,106 @@ http://<public-ip>:8501
 
 ---
 
-# Key Learnings
+## Deployment Architecture
+
+```text
+Developer
+    ↓
+GitHub Repository
+    ↓
+GitHub Actions CI/CD
+    ↓
+Docker Build
+    ↓
+Amazon ECR
+    ↓
+AWS EC2
+    ↓
+Docker Container
+    ↓
+Streamlit Fraud Detection Application
+```
+
+---
+
+## Key Learnings
 
 This project provided hands-on exposure to:
 
+* Machine Learning model deployment
 * Infrastructure as Code (Terraform)
 * Docker containerization
 * AWS EC2 deployment workflows
 * Amazon ECR image management
+* GitHub Actions workflow automation
+* Continuous Integration and Continuous Deployment (CI/CD)
+* AWS authentication and deployment automation
 * Security groups and networking
 * SSH-based remote deployment
-* Debugging deployment issues in cloud environments
+* Debugging cloud deployment issues
+* Container runtime troubleshooting
+* Production-oriented DevOps practices
 
 ---
 
-# Challenges Faced
+## Challenges Faced
 
 Some real-world deployment challenges encountered during the project:
 
-* Docker daemon permission issues
-* ECR authentication problems
-* Security group configuration
-* Port exposure and accessibility
-* Remote deployment debugging
-* Container runtime troubleshooting
+* Git authentication and repository configuration issues
+* Windows filename length limitations
+* Terraform provider artifacts accidentally committed to Git
+* AWS region and credential configuration issues
+* ECR repository creation and image management challenges
+* Docker DNS resolution problems
+* EC2 networking and security group configuration
+* Missing SSH access configuration during infrastructure provisioning
+* Automated deployment troubleshooting through GitHub Actions
+* Container runtime and image pull debugging
+* Terraform initialization and state management
 
 ---
 
-# Future Improvements
+## Future Improvements
 
 Potential future enhancements:
 
-* CI/CD pipeline integration
-* Kubernetes-based orchestration
-* Model monitoring and logging
-* Cloud-native deployment workflows
-* Automated infrastructure provisioning
+* Kubernetes-based orchestration using Amazon EKS
+* Model monitoring and drift detection
+* CloudWatch-based logging and alerting
+* Blue-Green deployment strategy
+* Elastic IP and Route53 integration
+* Automated rollback mechanisms
 * Scalable inference architecture
+* Infrastructure modularization using Terraform modules
 
 ---
 
-# Deployment Architecture
+## Screenshots
 
-```text
-Terraform
-   ↓
-AWS EC2
-   ↓
-Docker Container
-   ↓
-Streamlit Fraud Detection Application
+### Terraform Workflow
+
+```bash
+terraform init
+terraform validate
+terraform apply
 ```
 
-Extended workflow:
+### Docker Deployment
 
-```text
-Local Application
-   ↓
-Docker Build
-   ↓
-Amazon ECR
-   ↓
-EC2 Pulls Image
-   ↓
-Container Deployment
-   ↓
-Hosted ML Application
+```bash
+docker pull
+docker run
 ```
 
----
+### Hosted Application
 
-# Screenshots
-
-## Terraform Workflow
-
-* terraform init
-* terraform validate
-* terraform apply
-
-## Docker Deployment
-
-* docker pull
-* docker run
-
-## Hosted Application
-
-* Streamlit fraud detection interface running on AWS EC2
+Streamlit fraud detection interface running on AWS EC2.
 
 ---
 
-# Author
+## Author
 
-Mahika Singh
+**Mahika Singh**
 
-ML Engineer | LLMs, RAG, Production AI Systems | AWS | FastAPI
+AI/ML Engineer | Data Engineering | LLMs | RAG | Production AI Systems | AWS | FastAPI | MLOps
