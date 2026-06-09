@@ -318,6 +318,7 @@ Potential future enhancements:
 ---
 
 ## Screenshots
+<img width="1593" height="633" alt="image" src="https://github.com/user-attachments/assets/10a5063b-6810-4d8f-8141-9ea3d183d8a9" />
 
 ### Terraform Workflow
 
