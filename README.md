@@ -41,7 +41,7 @@ Users can upload transaction data through a Streamlit-based interface and receiv
 | CI/CD                  | GitHub Actions              |
 | Cloud Platform         | AWS                         |
 | AWS Services           | EC2, ECR                    |
-
+| Experiment Tracking    | MLflow                      |
 ---
 
 ## Project Structure
@@ -305,6 +305,7 @@ Some real-world deployment challenges encountered during the project:
 
 Potential future enhancements:
 
+* ✅ **MLflow experiment tracking** — integrated for comparing model variants (baseline, SMOTE, SMOTE + class weights) with full parameter and metric logging
 * Kubernetes-based orchestration using Amazon EKS
 * Model monitoring and drift detection
 * CloudWatch-based logging and alerting
